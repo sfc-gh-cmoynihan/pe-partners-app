@@ -32,6 +32,7 @@ jobs:
           warehouse = "COMPUTE_WH"
           role = "ACCOUNTADMIN"
           EOF
+          chmod 600 ~/.snowflake/connections.toml
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
           chmod 600 /tmp/rsa_key.p8
 
