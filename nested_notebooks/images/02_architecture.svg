@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow2" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b5ea6"/>
+    </marker>
+    <marker id="dasharrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="500" rx="16" fill="#f8f9fc"/>
+  <text x="450" y="35" text-anchor="middle" font-size="18" font-weight="700" fill="#1a1a2e">Architecture: Nested Notebooks Pipeline</text>
+
+  <!-- Orchestration Layer -->
+  <rect x="30" y="55" width="840" height="100" rx="12" fill="#eee8ff" stroke="#5b5ea6" stroke-width="1" stroke-dasharray="4"/>
+  <text x="50" y="75" font-size="11" font-weight="600" fill="#5b5ea6">ORCHESTRATION LAYER</text>
+
+  <rect x="60" y="90" width="220" height="50" rx="8" fill="#5b5ea6" filter="url(#shadow2)"/>
+  <text x="170" y="113" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">TASK: Deduplicate</text>
+  <text x="170" y="129" text-anchor="middle" font-size="9" fill="#c8c8ff">daily schedule (root)</text>
+
+  <line x1="280" y1="115" x2="330" y2="115" stroke="#5b5ea6" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <rect x="340" y="90" width="220" height="50" rx="8" fill="#5b5ea6" filter="url(#shadow2)"/>
+  <text x="450" y="113" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">TASK: UK View</text>
+  <text x="450" y="129" text-anchor="middle" font-size="9" fill="#c8c8ff">after dedup (child)</text>
+
+  <line x1="560" y1="115" x2="610" y2="115" stroke="#5b5ea6" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <rect x="620" y="90" width="220" height="50" rx="8" fill="#5b5ea6" filter="url(#shadow2)"/>
+  <text x="730" y="113" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">TASK: Ireland MV</text>
+  <text x="730" y="129" text-anchor="middle" font-size="9" fill="#c8c8ff">after UK (child)</text>
+
+  <!-- Dotted lines to notebooks -->
+  <line x1="170" y1="140" x2="170" y2="185" stroke="#999" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#dasharrow)"/>
+  <line x1="450" y1="140" x2="450" y2="185" stroke="#999" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#dasharrow)"/>
+  <line x1="730" y1="140" x2="730" y2="185" stroke="#999" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#dasharrow)"/>
+
+  <!-- Notebook icons -->
+  <rect x="110" y="190" width="120" height="40" rx="6" fill="#fff" stroke="#5b5ea6" stroke-width="1.5"/>
+  <text x="170" y="214" text-anchor="middle" font-size="10" fill="#5b5ea6" font-weight="500">01_dedup.ipynb</text>
+
+  <rect x="390" y="190" width="120" height="40" rx="6" fill="#fff" stroke="#5b5ea6" stroke-width="1.5"/>
+  <text x="450" y="214" text-anchor="middle" font-size="10" fill="#5b5ea6" font-weight="500">02_uk.ipynb</text>
+
+  <rect x="670" y="190" width="120" height="40" rx="6" fill="#fff" stroke="#5b5ea6" stroke-width="1.5"/>
+  <text x="730" y="214" text-anchor="middle" font-size="10" fill="#5b5ea6" font-weight="500">03_ireland.ipynb</text>
+
+  <!-- Data Layer -->
+  <rect x="30" y="250" width="840" height="130" rx="12" fill="#f0fff0" stroke="#6bcb77" stroke-width="1" stroke-dasharray="4"/>
+  <text x="50" y="270" font-size="11" font-weight="600" fill="#2d8a3e">DATA LAYER</text>
+
+  <rect x="60" y="285" width="160" height="70" rx="10" fill="#ff6b6b" filter="url(#shadow2)"/>
+  <text x="140" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">CUSTOMERS</text>
+  <text x="140" y="335" text-anchor="middle" font-size="10" fill="#ffe0e0">15 raw records</text>
+
+  <rect x="280" y="285" width="200" height="70" rx="10" fill="#ffd93d" filter="url(#shadow2)"/>
+  <text x="380" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#333">CUSTOMERS_GOLDEN</text>
+  <text x="380" y="335" text-anchor="middle" font-size="10" fill="#665500">15 deduped + GOLDEN_ID</text>
+
+  <rect x="540" y="285" width="140" height="70" rx="10" fill="#6bcb77" filter="url(#shadow2)"/>
+  <text x="610" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">CUSTOMERS_UK</text>
+  <text x="610" y="335" text-anchor="middle" font-size="10" fill="#d4ffd9">view (3 rows)</text>
+
+  <rect x="720" y="285" width="140" height="70" rx="10" fill="#4d96ff" filter="url(#shadow2)"/>
+  <text x="790" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">CUSTOMERS_IE</text>
+  <text x="790" y="335" text-anchor="middle" font-size="10" fill="#cce0ff">matview (0 rows)</text>
+
+  <!-- Data flow arrows -->
+  <line x1="170" y1="230" x2="140" y2="285" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="3" marker-end="url(#dasharrow)"/>
+  <line x1="170" y1="230" x2="350" y2="285" stroke="#ffd93d" stroke-width="1.5" marker-end="url(#dasharrow)"/>
+  <line x1="450" y1="230" x2="610" y2="285" stroke="#6bcb77" stroke-width="1.5" marker-end="url(#dasharrow)"/>
+  <line x1="730" y1="230" x2="790" y2="285" stroke="#4d96ff" stroke-width="1.5" marker-end="url(#dasharrow)"/>
+
+  <!-- Observability Layer -->
+  <rect x="30" y="400" width="840" height="85" rx="12" fill="#fff5e6" stroke="#f0a030" stroke-width="1" stroke-dasharray="4"/>
+  <text x="50" y="420" font-size="11" font-weight="600" fill="#b07000">OBSERVABILITY LAYER</text>
+
+  <rect x="280" y="435" width="340" height="40" rx="8" fill="#fff" stroke="#f0a030" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="450" y="459" text-anchor="middle" font-size="12" font-weight="600" fill="#b07000">PIPELINE_LINEAGE (audit log)</text>
+
+  <!-- Log arrows -->
+  <line x1="170" y1="230" x2="350" y2="435" stroke="#f0a030" stroke-width="1" stroke-dasharray="3" marker-end="url(#dasharrow)"/>
+  <line x1="450" y1="230" x2="430" y2="435" stroke="#f0a030" stroke-width="1" stroke-dasharray="3" marker-end="url(#dasharrow)"/>
+  <line x1="730" y1="230" x2="550" y2="435" stroke="#f0a030" stroke-width="1" stroke-dasharray="3" marker-end="url(#dasharrow)"/>
+
+  <text x="235" y="370" font-size="9" fill="#f0a030" transform="rotate(-40, 235, 370)">logs lineage</text>
+  <text x="430" y="383" font-size="9" fill="#f0a030" transform="rotate(-55, 430, 383)">logs lineage</text>
+  <text x="630" y="370" font-size="9" fill="#f0a030" transform="rotate(-40, 630, 370)">logs lineage</text>
+</svg>

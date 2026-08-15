@@ -1,0 +1,95 @@
+<div style="padding: 20px;">
+    <h2>Report Schedules</h2>
+    <p style="color: #6c757d; margin-bottom: 20px;">Manage automated report delivery schedules. Each schedule creates a Snowflake Task that emails the fund report on a recurring basis.</p>
+
+    <!-- Summary -->
+    <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+        <div style="background: #f8f9fa; border-radius: 8px; padding: 16px 24px; border-left: 4px solid #29b5e8;">
+            <div style="font-size: 11px; color: #6c757d; text-transform: uppercase;">Active Schedules</div>
+            <div style="font-size: 28px; font-weight: 700; color: #29b5e8;">{{schedules.length}}</div>
+        </div>
+    </div>
+
+    <!-- Create Schedule Form -->
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 14px;">Create New Schedule</h3>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+            <div>
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Fund</label>
+                <select ng-model="schedule.fund_id" ng-options="f.FUND_ID as f.FUND_NAME for f in funds" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;">
+                    <option value="">All Funds</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Recipient Email</label>
+                <input type="email" ng-model="schedule.recipient" placeholder="email@example.com" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px; width: 200px;">
+            </div>
+            <div>
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Frequency</label>
+                <select ng-model="schedule.frequency" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;">
+                    <option value="DAILY">Daily</option>
+                    <option value="WEEKLY">Weekly</option>
+                    <option value="MONTHLY">Monthly</option>
+                </select>
+            </div>
+            <div ng-if="schedule.frequency === 'WEEKLY'">
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Day of Week</label>
+                <select ng-model="schedule.day_of_week" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;">
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                </select>
+            </div>
+            <div ng-if="schedule.frequency === 'MONTHLY'">
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Day of Month</label>
+                <select ng-model="schedule.day_of_month" ng-options="d for d in daysOfMonth" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;"></select>
+            </div>
+            <div>
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Hour (UTC)</label>
+                <select ng-model="schedule.hour" ng-options="h for h in hours" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;"></select>
+            </div>
+            <div>
+                <label style="font-size: 11px; color: #6c757d; display: block; margin-bottom: 4px;">Minute</label>
+                <select ng-model="schedule.minute" ng-options="m for m in minutes" style="padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 12px;"></select>
+            </div>
+            <button ng-click="addSchedule()" style="padding: 8px 16px; background: #29b5e8; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 600;">Create Schedule</button>
+        </div>
+        <div ng-if="createError" style="color: #ef4444; font-size: 12px; margin-top: 8px;">{{createError}}</div>
+        <div ng-if="createSuccess" style="color: #22c55e; font-size: 12px; margin-top: 8px;">{{createSuccess}}</div>
+    </div>
+
+    <!-- Schedules Table -->
+    <div ng-if="schedules.length === 0 && !loading" style="text-align: center; padding: 40px; color: #6c757d;">
+        No active schedules. Create one above to automate report delivery.
+    </div>
+    <div ng-if="loading" style="text-align: center; padding: 40px; color: #29b5e8;">Loading schedules...</div>
+
+    <table ng-if="schedules.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <thead>
+            <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                <th style="padding: 10px; text-align: left;">Fund</th>
+                <th style="padding: 10px; text-align: left;">Recipient</th>
+                <th style="padding: 10px; text-align: left;">Frequency</th>
+                <th style="padding: 10px; text-align: left;">Cron Expression</th>
+                <th style="padding: 10px; text-align: left;">Task Name</th>
+                <th style="padding: 10px; text-align: left;">Created</th>
+                <th style="padding: 10px; text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="s in schedules" style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding: 10px;">{{s.FUND_NAME || 'All Funds'}}</td>
+                <td style="padding: 10px;">{{s.RECIPIENT_EMAIL}}</td>
+                <td style="padding: 10px;"><span style="background: #e8f4fd; color: #1565c0; padding: 2px 8px; border-radius: 12px; font-size: 11px;">{{s.FREQUENCY}}</span></td>
+                <td style="padding: 10px; font-family: monospace; font-size: 11px;">{{s.CRON_EXPR}}</td>
+                <td style="padding: 10px; font-family: monospace; font-size: 11px;">{{s.TASK_NAME}}</td>
+                <td style="padding: 10px;">{{s.CREATED_AT | date:'dd MMM yyyy HH:mm'}}</td>
+                <td style="padding: 10px; text-align: center;">
+                    <button ng-click="deleteSchedule(s)" style="padding: 4px 10px; background: #ef4444; color: #fff; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

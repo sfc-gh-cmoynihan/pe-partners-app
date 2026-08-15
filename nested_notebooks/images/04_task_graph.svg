@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow4" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fff"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="280" rx="16" fill="#1a1a2e"/>
+  <text x="450" y="35" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">Task Dependency Graph</text>
+  <text x="450" y="55" text-anchor="middle" font-size="11" fill="#888">Sequential execution: each child fires only after its parent succeeds</text>
+
+  <!-- Task 1 -->
+  <rect x="50" y="90" width="230" height="90" rx="14" fill="#5b5ea6" filter="url(#shadow4)"/>
+  <text x="165" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#c8c8ff">ROOT TASK</text>
+  <text x="165" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Deduplicate Customers</text>
+  <text x="165" y="163" text-anchor="middle" font-size="10" fill="#a0a0ff">Schedule: daily (1440 min)</text>
+
+  <!-- Arrow 1-2 -->
+  <line x1="280" y1="135" x2="340" y2="135" stroke="#fff" stroke-width="3" marker-end="url(#arrow4)"/>
+  <text x="310" y="125" text-anchor="middle" font-size="8" fill="#6bcb77" font-weight="600">SUCCESS</text>
+
+  <!-- Task 2 -->
+  <rect x="345" y="90" width="210" height="90" rx="14" fill="#5b5ea6" filter="url(#shadow4)"/>
+  <text x="450" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#c8c8ff">CHILD TASK</text>
+  <text x="450" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Create UK View</text>
+  <text x="450" y="163" text-anchor="middle" font-size="10" fill="#a0a0ff">After: Deduplicate</text>
+
+  <!-- Arrow 2-3 -->
+  <line x1="555" y1="135" x2="615" y2="135" stroke="#fff" stroke-width="3" marker-end="url(#arrow4)"/>
+  <text x="585" y="125" text-anchor="middle" font-size="8" fill="#6bcb77" font-weight="600">SUCCESS</text>
+
+  <!-- Task 3 -->
+  <rect x="620" y="90" width="230" height="90" rx="14" fill="#5b5ea6" filter="url(#shadow4)"/>
+  <text x="735" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#c8c8ff">CHILD TASK</text>
+  <text x="735" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Create Ireland MV</text>
+  <text x="735" y="163" text-anchor="middle" font-size="10" fill="#a0a0ff">After: UK View</text>
+
+  <!-- Notebook labels below -->
+  <line x1="165" y1="180" x2="165" y2="210" stroke="#666" stroke-width="1" stroke-dasharray="3"/>
+  <rect x="90" y="212" width="150" height="30" rx="6" fill="#2a2a4e" stroke="#5b5ea6"/>
+  <text x="165" y="231" text-anchor="middle" font-size="10" fill="#c8c8ff">01_dedup.ipynb</text>
+
+  <line x1="450" y1="180" x2="450" y2="210" stroke="#666" stroke-width="1" stroke-dasharray="3"/>
+  <rect x="380" y="212" width="140" height="30" rx="6" fill="#2a2a4e" stroke="#5b5ea6"/>
+  <text x="450" y="231" text-anchor="middle" font-size="10" fill="#c8c8ff">02_uk.ipynb</text>
+
+  <line x1="735" y1="180" x2="735" y2="210" stroke="#666" stroke-width="1" stroke-dasharray="3"/>
+  <rect x="660" y="212" width="150" height="30" rx="6" fill="#2a2a4e" stroke="#5b5ea6"/>
+  <text x="735" y="231" text-anchor="middle" font-size="10" fill="#c8c8ff">03_ireland.ipynb</text>
+
+  <!-- Footer -->
+  <text x="450" y="265" text-anchor="middle" font-size="10" fill="#666">EXECUTE TASK TASK_DEDUPLICATE_CUSTOMERS; triggers the entire chain</text>
+</svg>

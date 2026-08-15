@@ -1,0 +1,31 @@
+<div>
+    <h2 class="section-title">Call Transcript Search</h2>
+
+    <div class="search-box">
+        <input type="text" ng-model="query" placeholder="Search call transcripts... (e.g. 'revenue growth', 'acquisition strategy')" ng-keypress="$event.keyCode === 13 && search()">
+        <button ng-click="search()" ng-disabled="searching">{{searching ? 'Searching...' : 'Search'}}</button>
+    </div>
+
+    <div class="sample-questions" ng-if="!searched" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+        <span class="tag" style="cursor: pointer; padding: 6px 12px;" ng-click="query='revenue growth forecast'; search()">Revenue growth</span>
+        <span class="tag" style="cursor: pointer; padding: 6px 12px;" ng-click="query='acquisition pipeline'; search()">Acquisition pipeline</span>
+        <span class="tag" style="cursor: pointer; padding: 6px 12px;" ng-click="query='ESG sustainability targets'; search()">ESG targets</span>
+        <span class="tag" style="cursor: pointer; padding: 6px 12px;" ng-click="query='debt refinancing'; search()">Debt refinancing</span>
+    </div>
+
+    <div ng-if="searching" class="loading">Searching call transcripts...</div>
+
+    <div class="search-results" ng-if="!searching && results.length > 0">
+        <div class="search-result-card" ng-repeat="r in results">
+            <div class="result-title">{{r.DOCUMENT_TITLE}}</div>
+            <div class="result-meta">
+                <span>{{r.SOURCE_TYPE}}</span>
+                <span ng-if="r.SENTIMENT" class="tag">{{r.SENTIMENT}}</span>
+            </div>
+            <div ng-if="r.SUMMARY" style="font-size: 12px; color: #64748b; margin-bottom: 8px; font-style: italic;">{{r.SUMMARY}}</div>
+            <div class="result-content">{{r.CHUNK_TEXT | limitTo:500}}</div>
+        </div>
+    </div>
+
+    <div ng-if="!searching && searched && results.length === 0" class="loading">No results found.</div>
+</div>

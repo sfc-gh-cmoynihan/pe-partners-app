@@ -1,0 +1,101 @@
+<div>
+    <h2 class="section-title">Fund Overview</h2>
+
+    <div class="metric-cards">
+        <div class="metric-card">
+            <div class="label">Total AUM</div>
+            <div class="value">{{totalAUM | gbpCurrency}}</div>
+            <div class="sub">Across {{funds.length}} funds</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="chart-section" ng-if="!loadingFunds && !loadingInvestments">
+        <div class="chart-breadcrumb" ng-if="drillFund">
+            <a ng-click="backToAllFunds()">All Funds</a> &rarr; <strong>{{drillFund.FUND_NAME}}</strong>
+        </div>
+
+        <!-- Top-level: AUM by Fund -->
+        <div class="chart-grid" ng-if="!drillFund">
+            <div class="chart-box">
+                <h3 class="chart-title">AUM by Fund</h3>
+                <canvas id="aumChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Drill-down: Sector + Position charts -->
+        <div class="chart-grid chart-grid-2" ng-if="drillFund">
+            <div class="chart-box">
+                <h3 class="chart-title">Sector Exposure — {{drillFund.FUND_NAME}}</h3>
+                <canvas id="sectorChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3 class="chart-title">Position Weights — {{drillFund.FUND_NAME}}</h3>
+                <canvas id="weightChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="loadingFunds" class="loading">Loading funds...</div>
+
+    <div class="fund-cards" ng-if="!loadingFunds">
+        <div class="fund-card" ng-repeat="f in funds">
+            <div class="fund-name">{{f.FUND_NAME}}</div>
+            <div class="fund-strategy">{{f.STRATEGY}}</div>
+            <div class="fund-details">
+                <div>
+                    <div class="detail-label">AUM</div>
+                    <div class="detail-value">{{f.TOTAL_AUM_GBP | gbpCurrency}}</div>
+                </div>
+                <div>
+                    <div class="detail-label">Mgmt Fee</div>
+                    <div class="detail-value">{{f.MANAGEMENT_FEE_PCT}}%</div>
+                </div>
+                <div>
+                    <div class="detail-label">Perf Fee</div>
+                    <div class="detail-value">{{f.PERFORMANCE_FEE_PCT}}%</div>
+                </div>
+                <div>
+                    <div class="detail-label">Min Investment</div>
+                    <div class="detail-value">{{f.MINIMUM_INVESTMENT_GBP | gbpCurrency}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top: 32px;">Portfolio Positions</h2>
+
+    <div class="filters">
+        <select ng-model="selectedFundId" ng-change="loadInvestments()">
+            <option value="">All Funds</option>
+            <option ng-repeat="f in funds" value="{{f.FUND_ID}}">{{f.FUND_NAME}}</option>
+        </select>
+    </div>
+
+    <div ng-if="loadingInvestments" class="loading">Loading positions...</div>
+
+    <table class="data-table" ng-if="!loadingInvestments">
+        <thead>
+            <tr>
+                <th>Security</th>
+                <th>Ticker</th>
+                <th>Sector</th>
+                <th>Type</th>
+                <th>Market Value</th>
+                <th>Weight</th>
+                <th>Geography</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="i in investments">
+                <td>{{i.SECURITY_NAME}}</td>
+                <td>{{i.TICKER}}</td>
+                <td>{{i.SECTOR}}</td>
+                <td><span class="badge" ng-class="{'badge-long': i.POSITION_TYPE==='LONG', 'badge-short': i.POSITION_TYPE==='SHORT'}">{{i.POSITION_TYPE}}</span></td>
+                <td>{{i.MARKET_VALUE_GBP | gbpCurrency}}</td>
+                <td>{{i.WEIGHT_PCT | pct}}</td>
+                <td>{{i.GEOGRAPHY}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

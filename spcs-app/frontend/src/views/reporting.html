@@ -1,0 +1,166 @@
+<div>
+    <div class="report-header">
+        <h2 class="section-title" style="margin-bottom: 0;">PE Reporting</h2>
+        <div class="report-actions">
+            <button class="btn" ng-click="downloadPdf()">Download PDF</button>
+            <button class="btn" ng-class="{active: showEmailPanel}" ng-click="toggleEmailPanel()">Email Report</button>
+            <button class="btn" ng-class="{active: showSchedulePanel}" ng-click="toggleSchedulePanel()">Schedule</button>
+        </div>
+    </div>
+
+    <div class="filters">
+        <select ng-model="selectedFundId" ng-change="loadPerformance()">
+            <option value="">All Funds</option>
+            <option ng-repeat="f in funds" value="{{f.FUND_ID}}">{{f.FUND_NAME}}</option>
+        </select>
+    </div>
+
+    <!-- Email panel -->
+    <div class="report-panel" ng-if="showEmailPanel">
+        <div class="report-panel-row">
+            <input type="email" placeholder="recipient@example.com" ng-model="emailRecipient">
+            <button class="btn" ng-disabled="emailSending" ng-click="sendEmailReport()">{{emailSending ? 'Sending...' : 'Send'}}</button>
+        </div>
+        <div class="report-panel-note">Recipient must be a verified email address of a user in this Snowflake account. The email contains a formatted HTML report (no PDF attachment).</div>
+        <div ng-if="emailStatus" ng-class="{'positive': emailStatus.ok, 'negative': !emailStatus.ok}" class="report-status">{{emailStatus.msg}}</div>
+    </div>
+
+    <!-- Schedule panel -->
+    <div class="report-panel" ng-if="showSchedulePanel">
+        <div class="report-panel-row">
+            <select ng-model="schedule.frequency">
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+            </select>
+            <select ng-if="schedule.frequency === 'WEEKLY'" ng-model="schedule.day_of_week">
+                <option value="0">Sunday</option>
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+            </select>
+            <select ng-if="schedule.frequency === 'MONTHLY'" ng-model="schedule.day_of_month">
+                <option ng-repeat="d in [1,2,3,4,5,6,7,8,9,10,15,20,25,28]" value="{{d}}">Day {{d}}</option>
+            </select>
+            <input type="number" min="0" max="23" ng-model="schedule.hour" style="width: 70px;" title="Hour (24h)">
+            <input type="number" min="0" max="59" ng-model="schedule.minute" style="width: 70px;" title="Minute">
+            <input type="email" placeholder="recipient@example.com" ng-model="schedule.recipient">
+            <button class="btn" ng-disabled="scheduleSaving" ng-click="addSchedule()">{{scheduleSaving ? 'Saving...' : 'Add Schedule'}}</button>
+        </div>
+        <div class="report-panel-note">Times are in Europe/London. Recipient must be a verified account email. Runs via a Snowflake Task even if the app is offline.</div>
+        <div ng-if="scheduleStatus" ng-class="{'positive': scheduleStatus.ok, 'negative': !scheduleStatus.ok}" class="report-status">{{scheduleStatus.msg}}</div>
+
+        <table class="data-table" ng-if="schedules.length" style="margin-top: 12px;">
+            <thead>
+                <tr><th>Fund</th><th>Recipient</th><th>Frequency</th><th>Cron</th><th></th></tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="s in schedules">
+                    <td>{{s.FUND_NAME}}</td>
+                    <td>{{s.RECIPIENT_EMAIL}}</td>
+                    <td>{{s.FREQUENCY}}</td>
+                    <td>{{s.CRON_EXPR}}</td>
+                    <td><button class="btn" style="padding: 4px 10px; font-size: 11px; background: #ef4444;" ng-click="deleteSchedule(s)">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Fund overview -->
+    <div class="metric-cards" ng-if="selectedFund">
+        <div class="metric-card">
+            <div class="label">Total AUM</div>
+            <div class="value">{{selectedFund.TOTAL_AUM_GBP | gbpCurrency}}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Strategy</div>
+            <div class="value" style="font-size: 14px;">{{selectedFund.STRATEGY}}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Mgmt / Perf Fee</div>
+            <div class="value" style="font-size: 14px;">{{selectedFund.MANAGEMENT_FEE_PCT}}% / {{selectedFund.PERFORMANCE_FEE_PCT}}%</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Minimum Investment</div>
+            <div class="value" style="font-size: 14px;">{{selectedFund.MINIMUM_INVESTMENT_GBP | gbpCurrency}}</div>
+        </div>
+    </div>
+
+    <div class="metric-cards" ng-if="!selectedFund && totalCommitments">
+        <div class="metric-card">
+            <div class="label">Total Investor Commitments (Firm-Wide)</div>
+            <div class="value">{{totalCommitments | gbpCurrency}}</div>
+            <div class="sub">Across {{customers.length}} investors — not attributed by fund</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid chart-grid-2" style="margin-bottom: 24px;">
+        <div class="chart-box">
+            <h3 class="chart-title">Returns</h3>
+            <canvas id="returnsChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3 class="chart-title">ROIC (YTD Return) by Fund</h3>
+            <canvas id="roicChart"></canvas>
+        </div>
+    </div>
+    <div class="report-panel-note" style="margin-bottom: 20px;">ROIC is shown as YTD return; the data model does not track capital calls/distributions.</div>
+
+    <div ng-if="loading" class="loading">Loading performance data...</div>
+
+    <h3 class="section-title" style="font-size: 15px;">Performance History</h3>
+    <table class="data-table" ng-if="!loading">
+        <thead>
+            <tr>
+                <th>Fund</th>
+                <th>Date</th>
+                <th>Monthly Return</th>
+                <th>YTD Return</th>
+                <th>NAV/Unit</th>
+                <th>Sharpe Ratio</th>
+                <th>Max Drawdown</th>
+                <th>Volatility</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="p in performance">
+                <td>{{p.FUND_NAME}}</td>
+                <td>{{p.REPORTING_DATE}}</td>
+                <td ng-class="{'positive': p.MONTHLY_RETURN_PCT > 0, 'negative': p.MONTHLY_RETURN_PCT < 0}">{{p.MONTHLY_RETURN_PCT | pct}}</td>
+                <td ng-class="{'positive': p.YTD_RETURN_PCT > 0, 'negative': p.YTD_RETURN_PCT < 0}">{{p.YTD_RETURN_PCT | pct}}</td>
+                <td>{{p.NAV_PER_UNIT | number:2}}</td>
+                <td>{{p.SHARPE_RATIO | number:2}}</td>
+                <td class="negative">{{p.MAX_DRAWDOWN_PCT | pct}}</td>
+                <td>{{p.VOLATILITY_PCT | pct}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 class="section-title" style="font-size: 15px; margin-top: 24px;">Portfolio Positions{{selectedFund ? ' — ' + selectedFund.FUND_NAME : ''}}</h3>
+    <table class="data-table" ng-if="investments">
+        <thead>
+            <tr>
+                <th>Security</th>
+                <th>Ticker</th>
+                <th>Sector</th>
+                <th>Type</th>
+                <th>Market Value</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="i in investments">
+                <td>{{i.SECURITY_NAME}}</td>
+                <td>{{i.TICKER}}</td>
+                <td>{{i.SECTOR}}</td>
+                <td><span class="badge" ng-class="{'badge-long': i.POSITION_TYPE==='LONG', 'badge-short': i.POSITION_TYPE==='SHORT'}">{{i.POSITION_TYPE}}</span></td>
+                <td>{{i.MARKET_VALUE_GBP | gbpCurrency}}</td>
+                <td>{{i.WEIGHT_PCT | pct}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

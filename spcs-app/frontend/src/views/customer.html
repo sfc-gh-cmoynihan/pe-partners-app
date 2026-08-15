@@ -1,0 +1,72 @@
+<div>
+    <h2 class="section-title">Customer Overview</h2>
+
+    <div class="metric-cards">
+        <div class="metric-card">
+            <div class="label">Total AUM Commitment</div>
+            <div class="value">{{totalAUM | gbpCurrency}}</div>
+            <div class="sub">Across {{customers.length}} investors</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Active Investors</div>
+            <div class="value">{{activeCount}}</div>
+            <div class="sub">of {{customers.length}} total</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Average Commitment</div>
+            <div class="value">{{avgCommitment | gbpCurrency}}</div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <select ng-model="filters.investor_type" ng-change="loadData()">
+            <option value="">All Investor Types</option>
+            <option>Family Office</option>
+            <option>Pension Fund</option>
+            <option>Sovereign Wealth Fund</option>
+            <option>Endowment</option>
+            <option>Insurance Company</option>
+        </select>
+        <select ng-model="filters.region" ng-change="loadData()">
+            <option value="">All Regions</option>
+            <option>Europe</option>
+            <option>North America</option>
+            <option>Middle East</option>
+            <option>Asia-Pacific</option>
+        </select>
+        <select ng-model="filters.status" ng-change="loadData()">
+            <option value="">All Status</option>
+            <option>Active</option>
+            <option>Inactive</option>
+        </select>
+    </div>
+
+    <div ng-if="loading" class="loading">Loading customers...</div>
+
+    <table class="data-table" ng-if="!loading">
+        <thead>
+            <tr>
+                <th ng-click="sortBy('FULL_NAME')">Name</th>
+                <th ng-click="sortBy('COMPANY_NAME')">Company</th>
+                <th ng-click="sortBy('INVESTOR_TYPE')">Type</th>
+                <th ng-click="sortBy('REGION')">Region</th>
+                <th ng-click="sortBy('AUM_COMMITMENT_GBP')">AUM Commitment</th>
+                <th ng-click="sortBy('RISK_PROFILE')">Risk Profile</th>
+                <th ng-click="sortBy('RELATIONSHIP_MANAGER')">RM</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="c in customers | orderBy:sortField:sortReverse">
+                <td>{{c.FULL_NAME}}</td>
+                <td>{{c.COMPANY_NAME}}</td>
+                <td>{{c.INVESTOR_TYPE}}</td>
+                <td>{{c.REGION}}</td>
+                <td>{{c.AUM_COMMITMENT_GBP | gbpCurrency}}</td>
+                <td>{{c.RISK_PROFILE}}</td>
+                <td>{{c.RELATIONSHIP_MANAGER}}</td>
+                <td><span class="badge" ng-class="{'badge-active': c.STATUS==='Active', 'badge-inactive': c.STATUS==='Inactive'}">{{c.STATUS}}</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

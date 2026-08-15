@@ -1,0 +1,75 @@
+<div>
+    <h2 class="section-title">Doc Search — Company Filings (SEC EDGAR)</h2>
+
+    <div class="search-box">
+        <input type="text" ng-model="query" placeholder="Semantic search across all filings... (e.g. 'capital expenditure plans', 'supply chain risk')" ng-keypress="$event.keyCode === 13 && search()">
+        <button ng-click="search()" ng-disabled="searching">{{searching ? 'Searching...' : 'Search'}}</button>
+    </div>
+
+    <div ng-if="searching" class="loading">Searching filings...</div>
+
+    <div class="search-results" ng-if="!searching && searchResults.length > 0" style="margin-bottom: 24px;">
+        <div class="search-result-card" ng-repeat="r in searchResults">
+            <div class="result-title">{{r.COMPANY_NAME}} — {{r.FORM_TYPE}} ({{r.FILING_CATEGORY}})</div>
+            <div class="result-meta">
+                <span>{{r.TICKER}}</span>
+                <span>{{r.FILING_DATE}}</span>
+            </div>
+            <div class="result-content">{{r.CHUNK_TEXT | limitTo:500}}</div>
+        </div>
+    </div>
+    <div ng-if="!searching && searched && searchResults.length === 0" class="loading">No results found.</div>
+
+    <h3 class="section-title" style="font-size: 15px; margin-top: 8px;">Browse by Company</h3>
+    <div class="filters">
+        <select ng-model="selectedTicker" ng-change="loadFilings()">
+            <option value="">Select a company...</option>
+            <option ng-repeat="c in companies" value="{{c.TICKER}}">{{c.COMPANY_NAME}} ({{c.TICKER}})</option>
+        </select>
+        <select ng-model="selectedFilingId" ng-change="selectFiling()" ng-disabled="!filings.length">
+            <option value="">Select a filing...</option>
+            <option ng-repeat="f in filings" value="{{f.FILING_ID}}">{{f.FORM_TYPE}} — {{f.FILING_CATEGORY}} ({{f.FILING_DATE}})</option>
+        </select>
+    </div>
+
+    <div ng-if="activeFiling" class="report-panel" style="margin-top: 16px;">
+        <div class="report-header" style="margin-bottom: 12px;">
+            <div>
+                <div style="font-weight:600; color:#0f172a;">{{activeFiling.COMPANY_NAME}} — Form {{activeFiling.FORM_TYPE}}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                    {{activeFiling.FILING_CATEGORY}} · Filed {{activeFiling.FILING_DATE}} ·
+                    <a href="{{activeFiling.SOURCE_URL}}" target="_blank" rel="noopener">View on SEC EDGAR</a>
+                </div>
+            </div>
+            <div class="report-actions">
+                <button class="btn" ng-class="{active: showTranscript}" ng-click="showTranscript = !showTranscript">{{showTranscript ? 'Hide Full Text' : 'Full Text'}}</button>
+            </div>
+        </div>
+
+        <div ng-if="loadingAnalysis" class="loading">Loading analysis...</div>
+        <div ng-if="analysisError" class="report-panel-note">{{analysisError}}</div>
+
+        <div ng-if="!loadingAnalysis && !analysisError">
+            <div ng-if="sentimentResult" class="sentiment-score-badge" ng-class="overallSentimentClass()">
+                <span class="score-value">{{overallSentimentScore()}}</span>
+                <span class="score-label">{{overallSentimentLabel()}}</span>
+            </div>
+            <div ng-if="!sentimentResult" class="report-panel-note" style="margin-bottom: 16px;">No sentiment data available.</div>
+
+            <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Summary</h3>
+            <div ng-if="summaryText" style="white-space: pre-wrap; font-size: 13px; color: #334155; line-height: 1.6; margin-bottom: 16px;">{{summaryText}}</div>
+        </div>
+
+        <div ng-if="showTranscript && !loadingAnalysis">
+            <div ng-if="transcriptHtml">
+                <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Full Text</h3>
+                <div ng-if="transcriptTruncated" class="report-panel-note" style="margin-bottom: 8px;">Showing first portion of the extracted text (document truncated).</div>
+                <div class="report-panel-note" style="margin-bottom: 8px;">
+                    <span style="color:#16a34a;font-weight:600;">Green</span> = positive language,
+                    <span style="color:#dc2626;font-weight:600;">red</span> = negative/risk language.
+                </div>
+                <div ng-bind-html="transcriptHtml" style="white-space: normal; font-size: 12px; color: #475569; line-height: 1.5; max-height: 500px; overflow-y: auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

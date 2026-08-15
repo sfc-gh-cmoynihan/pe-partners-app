@@ -1,0 +1,53 @@
+<div>
+    <h2 class="section-title">Call Analytics</h2>
+
+    <div class="filters">
+        <select ng-model="selectedCompany" ng-change="onCompanyChange()" ng-options="c.COMPANY_NAME as (c.COMPANY_NAME + ' (' + c.TICKER + ')') for c in companies">
+            <option value="">Select a company...</option>
+        </select>
+        <select ng-if="calls.length > 0" ng-model="selectedCall" ng-change="onCallChange()" ng-options="call.CALL_ID as (call.CALL_TITLE + ' \u2014 ' + call.CALL_DATE) for call in calls">
+        </select>
+    </div>
+
+    <div ng-if="!selectedCompany" class="loading">Select a portfolio company above to view its call recordings, transcripts, summaries and sentiment.</div>
+    <div ng-if="selectedCompany && loadingCalls" class="loading">Loading calls...</div>
+
+    <div ng-if="selectedCompany && !loadingCalls && calls.length > 0" class="call-analytics-layout">
+        <div>
+            <div class="call-list-item" ng-repeat="call in calls" ng-class="{active: call.CALL_ID === selectedCall}" ng-click="selectedCall = call.CALL_ID; onCallChange()">
+                <div class="call-title-row">
+                    <span class="call-title">{{call.CALL_TITLE}}</span>
+                    <span class="badge" ng-class="sentimentClass(call.SENTIMENT)">{{call.SENTIMENT}}</span>
+                </div>
+                <div class="call-date">{{call.CALL_DATE}} &middot; {{call.PARTICIPANTS}}</div>
+            </div>
+        </div>
+
+        <div>
+            <div ng-if="loadingDetail" class="loading">Loading call...</div>
+
+            <div ng-if="!loadingDetail && callDetail" class="call-detail-column">
+                <div class="sentiment-score-badge" ng-class="scoreClass(callDetail.SENTIMENT_SCORE)">
+                    <span class="score-value">{{scoreValue(callDetail.SENTIMENT_SCORE)}}</span>
+                    <span class="score-label">{{callDetail.SENTIMENT}}</span>
+                </div>
+
+                <div class="call-meta-row">
+                    <span class="tag">{{callDetail.CALL_DATE}}</span>
+                    <span class="tag">{{callDetail.PARTICIPANTS}}</span>
+                </div>
+
+                <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">AI Summary</h3>
+                <div class="call-summary-box">{{callDetail.SUMMARY}}</div>
+
+                <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Recording</h3>
+                <div class="call-video-card">
+                    <video ng-src="{{videoUrl}}" controls preload="metadata"></video>
+                </div>
+
+                <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Transcript</h3>
+                <div class="call-transcript-box">{{callDetail.TRANSCRIPT}}</div>
+            </div>
+        </div>
+    </div>
+</div>

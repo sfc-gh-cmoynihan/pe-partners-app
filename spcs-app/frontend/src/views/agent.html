@@ -1,0 +1,38 @@
+<div class="agent-page">
+    <div class="agent-main">
+        <div class="agent-chat-panel">
+            <div class="agent-chat-messages">
+                <div ng-if="messages.length === 0 && !sending" class="agent-placeholder">
+                    Ask a question about the portfolio, funds, investors, or KPIs
+                </div>
+                <div ng-if="messages.length > 0 || sending" class="chat-messages">
+                    <div class="chat-message" ng-repeat="m in messages" ng-class="m.role">
+                        {{m.content}}<span ng-if="m.role === 'assistant' && !m.content && sending" class="loading">Thinking...</span>
+                        <div ng-if="m.role === 'assistant' && m.model" class="chat-message-meta">{{m.model}} &middot; {{m.timestamp | date:'d MMM y, HH:mm:ss'}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="agent-input-bar">
+                <input type="text" ng-model="input" placeholder="Ask about portfolio, funds, investors, KPIs..." ng-keypress="$event.keyCode === 13 && send()" ng-disabled="sending">
+                <button class="agent-go-btn" ng-click="send()" ng-disabled="sending || !input.trim()">Go</button>
+                <button class="agent-clear-btn" ng-click="messages = []; input = '';">Clear</button>
+            </div>
+        </div>
+    </div>
+    <div class="agent-sidebar">
+        <div class="agent-info-card">
+            <div class="agent-info-title">PE PARTNERS AGENT</div>
+            <div class="agent-info-model">{{agent.selectedModel}}</div>
+            <div class="agent-info-session">Session: {{today | date:'d MMM y'}} | v26</div>
+        </div>
+        <div class="agent-sidebar-section">
+            <label class="agent-sidebar-label">MODEL</label>
+            <select ng-model="agent.selectedModel" ng-options="m as m for m in models" class="agent-model-select">
+            </select>
+        </div>
+        <div class="agent-sidebar-section">
+            <label class="agent-sidebar-label">SAMPLE QUESTIONS</label>
+            <button class="agent-sample-btn" ng-repeat="q in sampleQuestions" ng-click="askSample(q)">{{q}}</button>
+        </div>
+    </div>
+</div>

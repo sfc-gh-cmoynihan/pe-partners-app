@@ -1,0 +1,31 @@
+name: Build and Push SPCS Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'spcs-app/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Snowflake Image Registry
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login \
+            sfseeurope-colm-uswest.registry.snowflakecomputing.com \
+            -u "${{ secrets.SNOWFLAKE_USER }}" \
+            --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build --platform linux/amd64 \
+            -t sfseeurope-colm-uswest.registry.snowflakecomputing.com/pepartners_db/core/pe_repo/pe-angular:latest \
+            ./spcs-app/
+
+      - name: Push to Snowflake Registry
+        run: |
+          docker push sfseeurope-colm-uswest.registry.snowflakecomputing.com/pepartners_db/core/pe_repo/pe-angular:latest
