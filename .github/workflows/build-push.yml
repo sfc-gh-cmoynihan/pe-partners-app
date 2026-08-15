@@ -10,22 +10,20 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: sfseeurope-colm-uswest.registry.snowflakecomputing.com
+      IMAGE: sfseeurope-colm-uswest.registry.snowflakecomputing.com/pepartners_db/core/pe_repo/pe-angular:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to Snowflake Image Registry
         run: |
-          echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login \
-            sfseeurope-colm-uswest.registry.snowflakecomputing.com \
+          echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login $REGISTRY \
             -u "${{ secrets.SNOWFLAKE_USER }}" \
             --password-stdin
 
       - name: Build Docker image
-        run: |
-          docker build --platform linux/amd64 \
-            -t sfseeurope-colm-uswest.registry.snowflakecomputing.com/pepartners_db/core/pe_repo/pe-angular:latest \
-            ./spcs-app/
+        run: docker build --platform linux/amd64 -t $IMAGE ./spcs-app/
 
       - name: Push to Snowflake Registry
-        run: |
-          docker push sfseeurope-colm-uswest.registry.snowflakecomputing.com/pepartners_db/core/pe_repo/pe-angular:latest
+        run: docker push $IMAGE
