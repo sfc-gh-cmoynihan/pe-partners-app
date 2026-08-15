@@ -16,11 +16,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to Snowflake Image Registry
+      - name: Install Snowflake CLI
         run: |
-          echo "${{ secrets.SNOWFLAKE_PASSWORD }}" | docker login $REGISTRY \
-            -u "${{ secrets.SNOWFLAKE_USER }}" \
-            --password-stdin
+          pip install snowflake-cli-labs
+          snow --version
+
+      - name: Configure Snowflake connection
+        run: |
+          mkdir -p ~/.snowflake
+          cat > ~/.snowflake/connections.toml << 'EOF'
+          [aws_uswest]
+          account = "SFSEEUROPE-COLM_USWEST"
+          user = "ADMIN"
+          private_key_file = "/tmp/rsa_key.p8"
+          warehouse = "COMPUTE_WH"
+          role = "ACCOUNTADMIN"
+          EOF
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
+          chmod 600 /tmp/rsa_key.p8
+
+      - name: Login to Snowflake Image Registry
+        run: snow spcs image-registry login -c aws_uswest
 
       - name: Build Docker image
         run: docker build --platform linux/amd64 -t $IMAGE ./spcs-app/
