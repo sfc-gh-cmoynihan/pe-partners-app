@@ -28,6 +28,7 @@ jobs:
           [aws_uswest]
           account = "SFSEEUROPE-COLM_USWEST"
           user = "ADMIN"
+          authenticator = "SNOWFLAKE_JWT"
           private_key_file = "/tmp/rsa_key.p8"
           warehouse = "COMPUTE_WH"
           role = "ACCOUNTADMIN"
