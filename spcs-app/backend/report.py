@@ -127,12 +127,12 @@ def _gbp(v):
         return "-"
     v = float(v)
     if abs(v) >= 1e9:
-        return f"GBP {v / 1e9:.2f}bn"
+        return f"USD {v / 1e9:.2f}bn"
     if abs(v) >= 1e6:
-        return f"GBP {v / 1e6:.1f}m"
+        return f"USD {v / 1e6:.1f}m"
     if abs(v) >= 1e3:
-        return f"GBP {v / 1e3:.0f}k"
-    return f"GBP {v:.0f}"
+        return f"USD {v / 1e3:.0f}k"
+    return f"USD {v:.0f}"
 
 
 def _pct(v):

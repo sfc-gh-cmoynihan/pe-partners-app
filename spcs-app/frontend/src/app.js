@@ -1,4 +1,4 @@
-var APP_VERSION = 'v27';
+var APP_VERSION = 'v3';
 var app = angular.module('peApp', ['ngRoute']);
 
 app.config(['$routeProvider', function($routeProvider) {
@@ -21,7 +21,7 @@ app.run(['$rootScope', '$location', '$http', function($rootScope, $location, $ht
     $rootScope.go = function(path) {
         $location.path(path);
     };
-    $rootScope.loginTime = new Date().toLocaleString('en-GB', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    $rootScope.loginTime = new Date().toLocaleString('en-US', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
     $rootScope.currentUser = '';
     $rootScope.logout = function() {
         window.location.href = '/logout';
@@ -35,10 +35,10 @@ app.filter('gbpCurrency', function() {
     return function(value) {
         if (value === null || value === undefined) return '-';
         var num = parseFloat(value);
-        if (num >= 1e9) return 'GBP ' + (num / 1e9).toFixed(2) + 'bn';
-        if (num >= 1e6) return 'GBP ' + (num / 1e6).toFixed(1) + 'm';
-        if (num >= 1e3) return 'GBP ' + (num / 1e3).toFixed(0) + 'k';
-        return 'GBP ' + num.toFixed(0);
+        if (num >= 1e9) return 'USD ' + (num / 1e9).toFixed(2) + 'bn';
+        if (num >= 1e6) return 'USD ' + (num / 1e6).toFixed(1) + 'm';
+        if (num >= 1e3) return 'USD ' + (num / 1e3).toFixed(0) + 'k';
+        return 'USD ' + num.toFixed(0);
     };
 });
 

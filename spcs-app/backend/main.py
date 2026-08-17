@@ -25,25 +25,25 @@ def health():
 
 @app.get("/api/customers")
 def list_customers():
-    return query("SELECT * FROM CUSTOMERS_IT ORDER BY AUM_COMMITMENT_GBP DESC")
+    return query("SELECT * FROM CUSTOMERS_STG ORDER BY AUM_COMMITMENT_GBP DESC")
 
 
 @app.get("/api/funds")
 def list_funds():
-    return query("SELECT * FROM FUNDS_IT ORDER BY TOTAL_AUM_GBP DESC")
+    return query("SELECT * FROM FUNDS_STG ORDER BY TOTAL_AUM_GBP DESC")
 
 
 @app.get("/api/investments")
 def list_investments():
-    return query("SELECT * FROM INVESTMENTS_IT ORDER BY MARKET_VALUE_GBP DESC")
+    return query("SELECT * FROM INVESTMENTS_STG ORDER BY MARKET_VALUE_GBP DESC")
 
 
 @app.get("/api/performance")
 def list_performance():
     return query("""
         SELECT fp.*, f.FUND_NAME
-        FROM FUND_PERFORMANCE_IT fp
-        JOIN FUNDS_IT f ON fp.FUND_ID = f.FUND_ID
+        FROM FUND_PERFORMANCE_STG fp
+        JOIN FUNDS_STG f ON fp.FUND_ID = f.FUND_ID
         ORDER BY fp.REPORTING_DATE DESC
     """)
 
@@ -208,7 +208,7 @@ def get_call_detail(call_id: str):
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("USE WAREHOUSE COMPUTE_WH")
-    cur.execute("SELECT * FROM COMPANY_CALLS WHERE CALL_ID = %s", (call_id,))
+    cur.execute("SELECT *, TRANSCRIPT_SUMMARY AS SUMMARY FROM COMPANY_CALLS WHERE CALL_ID = %s", (call_id,))
     cols = [d[0] for d in cur.description]
     row = cur.fetchone()
     if not row:
@@ -250,6 +250,7 @@ def list_models():
     return [
         "openai-gpt-5.2",
         "openai-gpt-5.4-mini",
+        "openai-gpt-5.4-nano",
         "openai-o3",
         "openai-o4-mini",
     ]
@@ -276,7 +277,7 @@ async def agent_chat(request: Request):
             cols = [d[0] for d in cur.description]
             fund_rows = [dict(zip(cols, r)) for r in funds]
             total_aum = sum(f['TOTAL_AUM_GBP'] or 0 for f in fund_rows)
-            context_parts.append(f"FUNDS (Total AUM: GBP {total_aum:,.0f}):\n" + "\n".join([f"- {f['FUND_NAME']}: AUM GBP {f['TOTAL_AUM_GBP']:,.0f}, Strategy: {f['STRATEGY']}, Mgmt Fee: {f['MANAGEMENT_FEE_PCT']}%, Perf Fee: {f['PERFORMANCE_FEE_PCT']}%" for f in fund_rows]))
+            context_parts.append(f"FUNDS (Total AUM: USD {total_aum:,.0f}):\n" + "\n".join([f"- {f['FUND_NAME']}: AUM USD {f['TOTAL_AUM_GBP']:,.0f}, Strategy: {f['STRATEGY']}, Mgmt Fee: {f['MANAGEMENT_FEE_PCT']}%, Perf Fee: {f['PERFORMANCE_FEE_PCT']}%" for f in fund_rows]))
         except Exception:
             pass
 
@@ -285,7 +286,7 @@ async def agent_chat(request: Request):
             invs = cur.fetchall()
             cols = [d[0] for d in cur.description]
             inv_rows = [dict(zip(cols, r)) for r in invs]
-            context_parts.append("POSITIONS:\n" + "\n".join([f"- {i['SECURITY_NAME']} ({i['TICKER']}): {i['POSITION_TYPE']}, Sector: {i['SECTOR']}, Value: GBP {i['MARKET_VALUE_GBP']:,.0f}, Weight: {i['WEIGHT_PCT']}%, Geo: {i['GEOGRAPHY']}" for i in inv_rows]))
+            context_parts.append("POSITIONS:\n" + "\n".join([f"- {i['SECURITY_NAME']} ({i['TICKER']}): {i['POSITION_TYPE']}, Sector: {i['SECTOR']}, Value: USD {i['MARKET_VALUE_GBP']:,.0f}, Weight: {i['WEIGHT_PCT']}%, Geo: {i['GEOGRAPHY']}" for i in inv_rows]))
         except Exception:
             pass
 
@@ -303,7 +304,7 @@ async def agent_chat(request: Request):
             custs = cur.fetchall()
             cols = [d[0] for d in cur.description]
             cust_rows = [dict(zip(cols, r)) for r in custs]
-            context_parts.append("INVESTORS:\n" + "\n".join([f"- {c['FULL_NAME']} ({c['COMPANY_NAME']}): {c['INVESTOR_TYPE']}, Region: {c['REGION']}, Commitment: GBP {c['AUM_COMMITMENT_GBP']:,.0f}" for c in cust_rows]))
+            context_parts.append("INVESTORS:\n" + "\n".join([f"- {c['FULL_NAME']} ({c['COMPANY_NAME']}): {c['INVESTOR_TYPE']}, Region: {c['REGION']}, Commitment: USD {c['AUM_COMMITMENT_GBP']:,.0f}" for c in cust_rows]))
         except Exception:
             pass
 

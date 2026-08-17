@@ -1,5 +1,5 @@
 app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
-    $scope.query = '';
+    $scope.query = 'Funding round';
     $scope.searchResults = [];
     $scope.searching = false;
     $scope.searched = false;
@@ -108,6 +108,11 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
 
     $http.get('/api/filings/companies').then(function(resp) {
         $scope.companies = resp.data || [];
+        var openai = $scope.companies.filter(function(c) { return c.TICKER === 'OAIP'; })[0];
+        if (openai) {
+            $scope.selectedTicker = openai.TICKER;
+            $scope.loadFilings();
+        }
     });
 
     $scope.search = function() {
@@ -161,4 +166,6 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
             $scope.loadingAnalysis = false;
         });
     };
+
+    $scope.search();
 }]);

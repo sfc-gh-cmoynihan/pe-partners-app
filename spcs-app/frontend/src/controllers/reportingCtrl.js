@@ -23,6 +23,11 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
 
     $http.get('/api/funds').then(function(resp) {
         $scope.funds = resp.data;
+        var defaultFund = resp.data.filter(function(f) { return f.FUND_NAME === 'PE Partners AI Growth Fund'; })[0];
+        if (defaultFund && !$scope.selectedFundId) {
+            $scope.selectedFundId = String(defaultFund.FUND_ID);
+            $scope.selectedFund = defaultFund;
+        }
         tryBuildCharts();
     });
 
@@ -47,7 +52,11 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
 
     function tryBuildCharts() {
         if ($scope.funds.length && $scope.allPerformance) {
-            $timeout(function() { buildReturnsChart(); buildRoicChart(); }, 100);
+            if ($scope.selectedFundId) {
+                $scope.loadPerformance();
+            } else {
+                $timeout(function() { buildReturnsChart(); buildRoicChart(); }, 100);
+            }
         }
     }
 

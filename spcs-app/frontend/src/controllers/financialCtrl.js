@@ -12,11 +12,15 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
     var weightChart = null;
 
     var strategyColors = {
-        'Long/Short Equity': '#3b82f6',
-        'Global Macro': '#8b5cf6',
-        'Event Driven': '#f59e0b',
-        'Multi-Strategy': '#10b981',
-        'Credit': '#ef4444'
+        'Growth Equity': '#3b82f6',
+        'Venture Capital': '#8b5cf6',
+        'Infrastructure': '#f59e0b',
+        'Applications': '#10b981',
+        'Multi-Strategy': '#ef4444',
+        'Long/Short Equity': '#0ea5e9',
+        'Global Macro': '#6366f1',
+        'Event Driven': '#f97316',
+        'Credit': '#ec4899'
     };
 
     $http.get('/api/funds').then(function(resp) {
@@ -53,7 +57,7 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'AUM (£M)',
+                    label: 'AUM ($M)',
                     data: data,
                     backgroundColor: colors,
                     borderRadius: 4
@@ -75,13 +79,13 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: function(ctx) { return '£' + ctx.parsed.x.toFixed(1) + 'M'; }
+                            label: function(ctx) { return '$' + ctx.parsed.x.toFixed(1) + 'M'; }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        ticks: { callback: function(v) { return '£' + v + 'M'; } },
+                        ticks: { callback: function(v) { return '$' + v + 'M'; } },
                         grid: { color: 'rgba(255,255,255,0.05)' }
                     },
                     y: { grid: { display: false } }
@@ -141,13 +145,13 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: function(ctx) { return ctx.dataset.label + ': £' + ctx.parsed.y.toFixed(1) + 'M'; }
+                            label: function(ctx) { return ctx.dataset.label + ': $' + ctx.parsed.y.toFixed(1) + 'M'; }
                         }
                     }
                 },
                 scales: {
                     y: {
-                        ticks: { callback: function(v) { return '£' + v + 'M'; } },
+                        ticks: { callback: function(v) { return '$' + v + 'M'; } },
                         grid: { color: 'rgba(255,255,255,0.05)' }
                     },
                     x: { grid: { display: false } }

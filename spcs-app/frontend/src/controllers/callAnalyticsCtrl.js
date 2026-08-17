@@ -9,6 +9,11 @@ app.controller('CallAnalyticsCtrl', ['$scope', '$http', '$sce', function($scope,
 
     $http.get('/api/calls/companies').then(function(resp) {
         $scope.companies = resp.data || [];
+        var openai = $scope.companies.filter(function(c) { return c.COMPANY_NAME === 'OpenAI'; })[0];
+        if (openai) {
+            $scope.selectedCompany = openai.COMPANY_NAME;
+            $scope.onCompanyChange();
+        }
     });
 
     $scope.onCompanyChange = function() {
@@ -29,12 +34,28 @@ app.controller('CallAnalyticsCtrl', ['$scope', '$http', '$sce', function($scope,
         });
     };
 
+    var positiveWords = ['growth', 'remarkable', 'thrilled', 'exceeded', 'extraordinary', 'record',
+        'improved', 'outstanding', 'phenomenal', 'transformative', 'incredible', 'excellent',
+        'strong', 'confident', 'profitability', 'advantage', 'efficiency', 'gains',
+        'innovation', 'exciting', 'opportunity', 'success', 'achievement', 'progress',
+        'optimistic', 'momentum', 'robust', 'accelerating', 'impressive', 'tremendous'];
+
+    function highlightPositive(text) {
+        if (!text) return '';
+        var escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        escaped = escaped.replace(/\n/g, '<br>');
+        var pattern = new RegExp('\\b(' + positiveWords.join('|') + ')\\b', 'gi');
+        return escaped.replace(pattern, '<span class="highlight-positive">$1</span>');
+    }
+
     $scope.onCallChange = function() {
         $scope.callDetail = null;
+        $scope.highlightedTranscript = '';
         if (!$scope.selectedCall) return;
         $scope.loadingDetail = true;
         $http.get('/api/calls/' + $scope.selectedCall).then(function(resp) {
             $scope.callDetail = resp.data;
+            $scope.highlightedTranscript = $sce.trustAsHtml(highlightPositive(resp.data.TRANSCRIPT));
             $scope.videoUrl = '/api/calls/' + $scope.selectedCall + '/video';
             $scope.loadingDetail = false;
         }, function() {
