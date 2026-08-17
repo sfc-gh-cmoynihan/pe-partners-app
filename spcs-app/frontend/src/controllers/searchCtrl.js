@@ -145,7 +145,7 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
         $scope.transcriptText = '';
         $scope.transcriptHtml = null;
         $scope.analysisError = null;
-        $scope.activeFiling = $scope.filings.filter(function(f) { return f.FILING_ID === $scope.selectedFilingId; })[0] || null;
+        $scope.activeFiling = $scope.filings.filter(function(f) { return String(f.FILING_ID) === String($scope.selectedFilingId); })[0] || null;
         if (!$scope.activeFiling) return;
 
         var filingId = $scope.activeFiling.FILING_ID;

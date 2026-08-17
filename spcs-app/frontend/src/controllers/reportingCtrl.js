@@ -69,10 +69,12 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
         return latest;
     }
 
+    var FUND_PALETTE = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16'];
+
     function barColors(values, highlightId, ids) {
         return values.map(function(v, idx) {
             if (highlightId && ids && ids[idx] === highlightId) return '#1d4ed8';
-            return v >= 0 ? '#16a34a' : '#dc2626';
+            return FUND_PALETTE[idx % FUND_PALETTE.length];
         });
     }
 
@@ -81,7 +83,7 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
         if (!ctx) return;
         if (returnsChart) returnsChart.destroy();
 
-        var labels, data, title;
+        var labels, data, title, ids = null;
         if ($scope.selectedFundId) {
             var id = parseInt($scope.selectedFundId);
             var rows = $scope.allPerformance.filter(function(p) { return p.FUND_ID === id; })
@@ -96,12 +98,13 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
                 .sort(function(a, b) { return a.FUND_NAME.localeCompare(b.FUND_NAME); });
             labels = rows2.map(function(r) { return r.FUND_NAME; });
             data = rows2.map(function(r) { return r.YTD_RETURN_PCT; });
+            ids = rows2.map(function(r) { return r.FUND_ID; });
             title = 'YTD Returns by Fund';
         }
 
         returnsChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: title, data: data, backgroundColor: barColors(data), borderRadius: 4 }] },
+            data: { labels: labels, datasets: [{ label: title, data: data, backgroundColor: barColors(data, null, ids), borderRadius: 4 }] },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -112,6 +115,15 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
                 scales: {
                     y: { ticks: { callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(0,0,0,0.05)' } },
                     x: { grid: { display: false } }
+                },
+                onClick: function(evt, elements) {
+                    if (!$scope.selectedFundId && elements.length && ids) {
+                        var idx = elements[0].index;
+                        $scope.$apply(function() {
+                            $scope.selectedFundId = String(ids[idx]);
+                            $scope.loadPerformance();
+                        });
+                    }
                 }
             }
         });
@@ -143,6 +155,15 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
                 scales: {
                     y: { ticks: { callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(0,0,0,0.05)' } },
                     x: { grid: { display: false } }
+                },
+                onClick: function(evt, elements) {
+                    if (elements.length) {
+                        var idx = elements[0].index;
+                        $scope.$apply(function() {
+                            $scope.selectedFundId = String(ids[idx]);
+                            $scope.loadPerformance();
+                        });
+                    }
                 }
             }
         });

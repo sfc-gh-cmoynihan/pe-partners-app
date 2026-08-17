@@ -439,9 +439,9 @@ async def create_report_schedule(request: Request):
 def list_report_schedules():
     return query("""
         SELECT * FROM PEPARTNERS_DB.CORE.PE_REPORT_SCHEDULES
-        WHERE ACTIVE = TRUE
+        WHERE IS_ACTIVE = TRUE
         ORDER BY CREATED_AT DESC
-    """, warehouse='COMPUTE_WH')
+    """)
 
 
 @app.delete("/api/reports/schedule/{schedule_id}")
@@ -463,7 +463,7 @@ def delete_report_schedule(schedule_id: int):
             pass
         cur.execute(f"DROP TASK IF EXISTS PEPARTNERS_DB.CORE.{task_name}")
         cur.execute(
-            "UPDATE PEPARTNERS_DB.CORE.PE_REPORT_SCHEDULES SET ACTIVE = FALSE WHERE SCHEDULE_ID = %s",
+            "UPDATE PEPARTNERS_DB.CORE.PE_REPORT_SCHEDULES SET IS_ACTIVE = FALSE WHERE SCHEDULE_ID = %s",
             (schedule_id,),
         )
         return {"status": "deleted"}

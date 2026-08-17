@@ -100,12 +100,12 @@
     <!-- Charts -->
     <div class="chart-grid chart-grid-2" style="margin-bottom: 24px;">
         <div class="chart-box">
-            <h3 class="chart-title">Returns</h3>
-            <canvas id="returnsChart"></canvas>
+            <h3 class="chart-title">Returns <span ng-if="selectedFundId" style="font-size: 12px; color: #6366f1; cursor: pointer; margin-left: 8px;" ng-click="selectedFundId=''; loadPerformance();">&larr; All Funds</span></h3>
+            <canvas id="returnsChart" style="cursor: pointer;"></canvas>
         </div>
         <div class="chart-box">
             <h3 class="chart-title">ROIC (YTD Return) by Fund</h3>
-            <canvas id="roicChart"></canvas>
+            <canvas id="roicChart" style="cursor: pointer;"></canvas>
         </div>
     </div>
     <div class="report-panel-note" style="margin-bottom: 20px;">ROIC is shown as YTD return; the data model does not track capital calls/distributions.</div>

@@ -26,10 +26,11 @@
             <option value="">Select a company...</option>
             <option ng-repeat="c in companies" value="{{c.TICKER}}">{{c.COMPANY_NAME}} ({{c.TICKER}})</option>
         </select>
-        <select ng-model="selectedFilingId" ng-change="selectFiling()" ng-disabled="!filings.length">
+        <select ng-model="selectedFilingId" ng-disabled="!filings.length">
             <option value="">Select a filing...</option>
             <option ng-repeat="f in filings" value="{{f.FILING_ID}}">{{f.FORM_TYPE}} — {{f.FILING_CATEGORY}} ({{f.FILING_DATE}})</option>
         </select>
+        <button class="btn" ng-disabled="!selectedFilingId" ng-click="selectFiling()">Go</button>
     </div>
 
     <div ng-if="activeFiling" class="report-panel" style="margin-top: 16px;">
