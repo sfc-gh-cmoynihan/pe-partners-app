@@ -42,7 +42,8 @@
 
                 <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Recording</h3>
                 <div class="call-video-card">
-                    <video ng-src="{{videoUrl}}" controls preload="metadata"></video>
+                    <iframe ng-if="youtubeVideoId" width="100%" height="315" ng-src="{{youtubeEmbedUrl}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe>
+                    <div ng-if="!youtubeVideoId" style="padding: 24px; color: #64748b; text-align: center;">No recording available.</div>
                 </div>
 
                 <h3 style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Transcript</h3>

@@ -56,7 +56,8 @@ app.controller('CallAnalyticsCtrl', ['$scope', '$http', '$sce', function($scope,
         $http.get('/api/calls/' + $scope.selectedCall).then(function(resp) {
             $scope.callDetail = resp.data;
             $scope.highlightedTranscript = $sce.trustAsHtml(highlightPositive(resp.data.TRANSCRIPT));
-            $scope.videoUrl = '/api/calls/' + $scope.selectedCall + '/video';
+            $scope.youtubeVideoId = resp.data.YOUTUBE_VIDEO_ID || null;
+            $scope.youtubeEmbedUrl = $scope.youtubeVideoId ? $sce.trustAsResourceUrl('https://www.youtube.com/embed/' + $scope.youtubeVideoId) : null;
             $scope.loadingDetail = false;
         }, function() {
             $scope.loadingDetail = false;
