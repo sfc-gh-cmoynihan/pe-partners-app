@@ -7,6 +7,60 @@
             <div class="value">{{totalAUM | gbpCurrency}}</div>
             <div class="sub">Across {{funds.length}} funds</div>
         </div>
+        <div class="metric-card">
+            <div class="label">Net Exposure</div>
+            <div class="value">{{kpis.netExposure | gbpCurrency}}</div>
+            <div class="sub">Long {{kpis.longExposure | gbpCurrency}} / Short {{kpis.shortExposure | gbpCurrency}}</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Largest Sector</div>
+            <div class="value">{{kpis.largestSector || 'N/A'}}</div>
+            <div class="sub">{{kpis.largestSectorValue | gbpCurrency}} deployed</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Platform Snapshot</div>
+            <div class="value">{{kpis.totalPositions}} positions</div>
+            <div class="sub">{{kpis.activeStrategies}} strategies, avg carry {{kpis.averagePerfFee | pct}}</div>
+        </div>
+    </div>
+
+    <div class="insight-grid" ng-if="!loadingFunds && !loadingInvestments && !drillFund">
+        <div class="insight-panel">
+            <div class="insight-header">
+                <h3>Top Tech Investments</h3>
+                <span>By market value</span>
+            </div>
+            <div class="insight-list">
+                <div class="insight-row" ng-repeat="position in topPositions">
+                    <div>
+                        <div class="insight-title">{{position.SECURITY_NAME}}</div>
+                        <div class="insight-meta">{{position.SECTOR}} · {{position.GEOGRAPHY}}</div>
+                    </div>
+                    <div class="insight-values">
+                        <div>{{position.MARKET_VALUE_GBP | gbpCurrency}}</div>
+                        <div class="insight-meta">{{position.WEIGHT_PCT | pct}} {{position.POSITION_TYPE}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="insight-panel">
+            <div class="insight-header">
+                <h3>Sector Concentration</h3>
+                <span>Top five allocations</span>
+            </div>
+            <div class="sector-bars">
+                <div class="sector-row" ng-repeat="sector in sectorSummary">
+                    <div class="sector-row-head">
+                        <span>{{sector.name}}</span>
+                        <span>{{sector.total | gbpCurrency}}</span>
+                    </div>
+                    <div class="sector-bar-track">
+                        <div class="sector-bar-fill" ng-style="{'width': (sector.sharePct > 100 ? 100 : sector.sharePct) + '%'}"></div>
+                    </div>
+                    <div class="insight-meta">{{sector.sharePct | pct}} of aggregate AUM</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Charts Section -->
@@ -58,6 +112,14 @@
                 <div>
                     <div class="detail-label">Min Investment</div>
                     <div class="detail-value">{{f.MINIMUM_INVESTMENT_GBP | gbpCurrency}}</div>
+                </div>
+                <div>
+                    <div class="detail-label">Inception</div>
+                    <div class="detail-value">{{f.INCEPTION_DATE}}</div>
+                </div>
+                <div>
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">{{f.FUND_STATUS}}</div>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 # Demo Script
 
-A guided walkthrough of the PE Partners LP Intelligence Platform.
+A guided walkthrough of the Blackstone-style LP Intelligence Platform demo.
 
 ---
 
@@ -33,7 +33,7 @@ Fund-level financial dashboard with AUM breakdown and portfolio positions.
 - Long/Short breakdown by sector (green = long, red = short)
 - Position weight curve shows portfolio concentration
 
-**Demo action:** Click "PE Partners AI Growth Fund" to see its sector allocation and top positions.
+**Demo action:** Click "Blackstone Capital Partners IX" to see its sector allocation and top positions.
 
 ---
 
@@ -50,7 +50,7 @@ Automated LP report generation with email delivery and scheduling.
 - Schedule recurring reports (daily/weekly/monthly) — creates a Snowflake Task behind the scenes
 
 **Demo action:**
-1. Fund defaults to "PE Partners AI Growth Fund"
+1. Fund defaults to "Blackstone Capital Partners IX"
 2. Click "Download PDF" to generate and view the report
 3. Show the scheduling panel — explain this creates a Snowflake CRON task
 

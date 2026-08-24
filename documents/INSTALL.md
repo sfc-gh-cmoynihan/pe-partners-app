@@ -56,20 +56,38 @@ The `ingress_url` column shows the public URL. It takes 1-2 minutes to provision
 
 > **Important:** Do NOT set `SNOWFLAKE_ACCOUNT` or `SNOWFLAKE_HOST` in the service spec env vars. Snowflake auto-injects these with the correct values for SPCS OAuth authentication.
 
-## Optional: Cortex Search (Document Search feature)
+## Document Search Deployment
 
-To enable the Document Search tab, create a Cortex Search service over your filing data:
+The app expects local filing PDFs in `documents/`.
 
-```sql
-CREATE CORTEX SEARCH SERVICE PEPARTNERS_DB.CORE.COMPANY_FILINGS_SEARCH_SERVICE
-  ON CHUNK_TEXT
-  WAREHOUSE = COMPUTE_WH
-  TARGET_LAG = '1 hour'
-  AS (
-    SELECT FILING_ID, COMPANY_NAME, TICKER, FORM_TYPE, FILING_CATEGORY, FILING_DATE, CHUNK_TEXT
-    FROM PEPARTNERS_DB.CORE.COMPANY_FILINGS_CHUNKS
-  );
+### File naming
+
+Use this pattern so metadata can be inferred during ingestion:
+
+```text
+<company>-<ticker>__<form_type>_<YYYY-MM-DD>_<title>.pdf
 ```
+
+Examples:
+
+```text
+openai-OAIP__10K_2026-03-15_annual-report.pdf
+anthropic-ANTH__8K_2026-06-01_board-update.pdf
+```
+
+### Build the document search assets
+
+```bash
+SNOW_CONNECTION=<your_connection_name> ./scripts/deploy_documents_search.sh
+```
+
+This script will:
+- create `PEPARTNERS_DB.CORE.DOCUMENTS_STAGE`
+- upload every PDF from `documents/`
+- run `setup/04_documents_search.sql`
+- recreate `PEPARTNERS_DB.CORE.COMPANY_FILINGS_SEARCH_SERVICE`
+
+The SQL pipeline parses PDFs, stores full text in `PEPARTNERS_DB.CORE.COMPANY_FILINGS_TEXT`, creates chunks in `PEPARTNERS_DB.CORE.COMPANY_FILINGS_CHUNKS`, generates summaries/sentiment in `PEPARTNERS_DB.CORE.COMPANY_FILINGS_ANALYSIS`, and publishes the Cortex Search service.
 
 ## Redeploying
 
@@ -85,6 +103,8 @@ docker push <image_url>
 DROP SERVICE PEPARTNERS_DB.CORE.PE_APP_V3;
 -- Then re-run the CREATE SERVICE statement above
 ```
+
+If only PDFs changed, you do not need to rebuild the container image. Re-run `./scripts/deploy_documents_search.sh` instead.
 
 ## Troubleshooting
 

@@ -111,7 +111,7 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
         var openai = $scope.companies.filter(function(c) { return c.TICKER === 'OAIP'; })[0];
         if (openai) {
             $scope.selectedTicker = openai.TICKER;
-            $scope.loadFilings();
+            $scope.loadFilings('Funding Round');
         }
     });
 
@@ -128,13 +128,20 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
         });
     };
 
-    $scope.loadFilings = function() {
+    $scope.loadFilings = function(autoSelectFormType) {
         $scope.filings = [];
         $scope.selectedFilingId = '';
         $scope.activeFiling = null;
         if (!$scope.selectedTicker) return;
         $http.get('/api/filings', { params: { ticker: $scope.selectedTicker } }).then(function(resp) {
             $scope.filings = resp.data || [];
+            if (autoSelectFormType && $scope.filings.length) {
+                var match = $scope.filings.filter(function(f) { return f.FORM_TYPE === autoSelectFormType; })[0];
+                if (match) {
+                    $scope.selectedFilingId = String(match.FILING_ID);
+                    $scope.selectFiling();
+                }
+            }
         });
     };
 

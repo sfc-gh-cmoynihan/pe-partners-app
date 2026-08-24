@@ -1,13 +1,13 @@
-# PE Partners - LP Intelligence Platform
+# Blackstone-Style Demo - LP Intelligence Platform
 
-A full-stack investment intelligence application for Private Equity fund management, deployed on Snowpark Container Services (SPCS). Built with FastAPI, AngularJS, and Snowflake Cortex AI.
+A full-stack investment intelligence application for private markets fund management, styled as a Blackstone-inspired demo, deployed on Snowpark Container Services (SPCS). Built with FastAPI, AngularJS, and Snowflake Cortex AI.
 
 ## Features
 
-- **Customer Overview** — LP investor tracking with AUM commitments, regions, and risk profiles
+- **Investor Overview** — LP investor tracking with AUM commitments, regions, and risk profiles
 - **Financial Dashboard** — Fund AUM visualization, sector allocation, and position weights
 - **LP Reporting** — Automated PDF report generation with email delivery and scheduling via Snowflake Tasks
-- **Document Search** — Cortex Search over SEC filings with AI-powered sentiment analysis and summarization
+- **Document Search** — Cortex Search over local annual reports, 8-Ks, and 10-K PDFs with AI-powered sentiment analysis and summarization
 - **Call Analytics** — Earnings call transcripts with video playback, sentiment scoring, and keyword highlighting
 - **AI Agent** — Conversational assistant powered by Cortex Complete with live portfolio data context
 
@@ -84,8 +84,24 @@ spcs-app/
 setup/
 ├── 01_ddl.sql           # Database, tables, interactive tables
 ├── 02_data.sql          # Sample data (funds, investors, positions)
-└── 03_deploy_service.sql # SPCS service creation
+├── 03_deploy_service.sql # SPCS service creation
+└── 04_documents_search.sql # PDF parsing, chunking, analysis, Cortex Search
+
+documents/
+└── README.md            # Local PDF drop folder for annual reports / 8-K / 10-K
+
+scripts/
+└── deploy_documents_search.sh # Upload PDFs and rebuild Cortex Search assets
 ```
+
+## Documents Workflow
+
+1. Place annual report, 8-K, and 10-K PDFs into `documents/`
+2. Name files as `<company>-<ticker>__<form_type>_<YYYY-MM-DD>_<title>.pdf`
+3. Run `SNOW_CONNECTION=<your_connection> ./scripts/deploy_documents_search.sh`
+4. Redeploy the SPCS service if you also changed application code
+
+The deployment script uploads PDFs to `@PEPARTNERS_DB.CORE.DOCUMENTS_STAGE`, parses them with Snowflake document AI, rebuilds the filing tables, and recreates `PEPARTNERS_DB.CORE.COMPANY_FILINGS_SEARCH_SERVICE`.
 
 ## CI/CD
 

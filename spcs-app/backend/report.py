@@ -158,8 +158,8 @@ def generate_pdf(fund_id):
     elements = []
 
     scope_name = data["fund"]["FUND_NAME"] if data["fund"] else "All Funds"
-    elements.append(Paragraph("PE Partners &mdash; LP Report", title_style))
-    elements.append(Paragraph(f"{scope_name} &nbsp;&bull;&nbsp; Generated {datetime.now().strftime('%d %b %Y %H:%M')}", body_style))
+    elements.append(Paragraph(f"PE Partners LP Report &mdash; {datetime.now().strftime('%d-%b-%Y')}", title_style))
+    elements.append(Paragraph(f"{scope_name}", body_style))
     elements.append(Spacer(1, 10))
 
     # Fund overview section

@@ -8,7 +8,12 @@ from fastapi.responses import JSONResponse, RedirectResponse, FileResponse, Resp
 from backend.db import get_conn, query
 from backend import report as report_module
 
-app = FastAPI(title="PE Partners API")
+app = FastAPI(title="Blackstone-Style Demo API")
+
+FILINGS_SEARCH_SERVICE = os.getenv(
+    "FILINGS_SEARCH_SERVICE",
+    "PEPARTNERS_DB.CORE.COMPANY_FILINGS_SEARCH_SERVICE",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,25 +30,25 @@ def health():
 
 @app.get("/api/customers")
 def list_customers():
-    return query("SELECT * FROM CUSTOMERS_STG ORDER BY AUM_COMMITMENT_GBP DESC")
+    return query("SELECT * FROM CUSTOMERS_IT ORDER BY AUM_COMMITMENT_GBP DESC")
 
 
 @app.get("/api/funds")
 def list_funds():
-    return query("SELECT * FROM FUNDS_STG ORDER BY TOTAL_AUM_GBP DESC")
+    return query("SELECT * FROM FUNDS_IT ORDER BY TOTAL_AUM_GBP DESC")
 
 
 @app.get("/api/investments")
 def list_investments():
-    return query("SELECT * FROM INVESTMENTS_STG ORDER BY MARKET_VALUE_GBP DESC")
+    return query("SELECT * FROM INVESTMENTS_IT ORDER BY MARKET_VALUE_GBP DESC")
 
 
 @app.get("/api/performance")
 def list_performance():
     return query("""
         SELECT fp.*, f.FUND_NAME
-        FROM FUND_PERFORMANCE_STG fp
-        JOIN FUNDS_STG f ON fp.FUND_ID = f.FUND_ID
+        FROM FUND_PERFORMANCE_IT fp
+        JOIN FUNDS_IT f ON fp.FUND_ID = f.FUND_ID
         ORDER BY fp.REPORTING_DATE DESC
     """)
 
@@ -64,7 +69,7 @@ async def search_filings(request: Request):
             "columns": ["FILING_ID", "COMPANY_NAME", "TICKER", "FORM_TYPE", "FILING_CATEGORY", "FILING_DATE", "CHUNK_TEXT"],
             "limit": 8,
         })
-        cur.execute("SELECT SNOWFLAKE.CORTEX.SEARCH_PREVIEW('PEPARTNERS_DB.CORE.COMPANY_FILINGS_SEARCH_SERVICE', %s)", (params,))
+        cur.execute("SELECT SNOWFLAKE.CORTEX.SEARCH_PREVIEW(%s, %s)", (FILINGS_SEARCH_SERVICE, params))
         row = cur.fetchone()
         items = []
         if row and row[0]:
@@ -309,7 +314,7 @@ async def agent_chat(request: Request):
             pass
 
         data_context = "\n\n".join(context_parts)
-        system_prompt = f"You are the PE Partners Investment Intelligence Assistant. Answer using ONLY the data below. Be concise with exact numbers.\n\n{data_context}"
+        system_prompt = f"You are the Blackstone-style Investment Intelligence Assistant. Answer using ONLY the data below. Be concise with exact numbers.\n\n{data_context}"
 
         cur.execute("""
             SELECT SNOWFLAKE.CORTEX.COMPLETE(

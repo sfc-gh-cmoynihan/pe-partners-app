@@ -1,11 +1,26 @@
 app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
     $scope.funds = [];
     $scope.investments = [];
+    $scope.allInvestments = [];
     $scope.loadingFunds = true;
     $scope.loadingInvestments = true;
     $scope.selectedFundId = null;
     $scope.totalAUM = 0;
     $scope.drillFund = null;
+    $scope.topPositions = [];
+    $scope.sectorSummary = [];
+    $scope.kpis = {
+        totalFunds: 0,
+        totalPositions: 0,
+        longExposure: 0,
+        shortExposure: 0,
+        netExposure: 0,
+        activeStrategies: 0,
+        largestSector: null,
+        largestSectorValue: 0,
+        averageMgmtFee: 0,
+        averagePerfFee: 0
+    };
 
     var aumChart = null;
     var sectorChart = null;
@@ -26,8 +41,10 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
     $http.get('/api/funds').then(function(resp) {
         $scope.funds = resp.data;
         $scope.totalAUM = resp.data.reduce(function(s, f) { return s + (f.TOTAL_AUM_GBP || 0); }, 0);
+        $scope.kpis.totalFunds = resp.data.length;
         $scope.loadingFunds = false;
         tryBuildCharts();
+        refreshSummary();
     });
 
     $http.get('/api/investments').then(function(resp) {
@@ -35,7 +52,63 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
         $scope.investments = resp.data;
         $scope.loadingInvestments = false;
         tryBuildCharts();
+        refreshSummary();
     });
+
+    function refreshSummary() {
+        if ($scope.loadingFunds || $scope.loadingInvestments) {
+            return;
+        }
+
+        var longExposure = 0;
+        var shortExposure = 0;
+        var sectorTotals = {};
+        var strategySet = {};
+
+        $scope.funds.forEach(function(fund) {
+            if (fund.STRATEGY) {
+                strategySet[fund.STRATEGY] = true;
+            }
+        });
+
+        $scope.allInvestments.forEach(function(position) {
+            var absoluteMarketValue = Math.abs(position.MARKET_VALUE_GBP || 0);
+            if (position.POSITION_TYPE === 'SHORT') {
+                shortExposure += absoluteMarketValue;
+            } else {
+                longExposure += absoluteMarketValue;
+            }
+            sectorTotals[position.SECTOR] = (sectorTotals[position.SECTOR] || 0) + absoluteMarketValue;
+        });
+
+        var sectorSummary = Object.keys(sectorTotals).map(function(sector) {
+            return {
+                name: sector,
+                total: sectorTotals[sector],
+                sharePct: $scope.totalAUM ? (sectorTotals[sector] / $scope.totalAUM) * 100 : 0
+            };
+        }).sort(function(a, b) { return b.total - a.total; });
+
+        $scope.sectorSummary = sectorSummary.slice(0, 5);
+        $scope.topPositions = $scope.allInvestments
+            .slice()
+            .sort(function(a, b) { return Math.abs(b.MARKET_VALUE_GBP || 0) - Math.abs(a.MARKET_VALUE_GBP || 0); })
+            .slice(0, 8);
+
+        $scope.kpis.totalPositions = $scope.allInvestments.length;
+        $scope.kpis.longExposure = longExposure;
+        $scope.kpis.shortExposure = shortExposure;
+        $scope.kpis.netExposure = longExposure - shortExposure;
+        $scope.kpis.activeStrategies = Object.keys(strategySet).length;
+        $scope.kpis.largestSector = sectorSummary.length ? sectorSummary[0].name : null;
+        $scope.kpis.largestSectorValue = sectorSummary.length ? sectorSummary[0].total : 0;
+        $scope.kpis.averageMgmtFee = $scope.funds.length ? $scope.funds.reduce(function(sum, fund) {
+            return sum + (fund.MANAGEMENT_FEE_PCT || 0);
+        }, 0) / $scope.funds.length : 0;
+        $scope.kpis.averagePerfFee = $scope.funds.length ? $scope.funds.reduce(function(sum, fund) {
+            return sum + (fund.PERFORMANCE_FEE_PCT || 0);
+        }, 0) / $scope.funds.length : 0;
+    }
 
     function tryBuildCharts() {
         if (!$scope.loadingFunds && !$scope.loadingInvestments) {
@@ -99,6 +172,10 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
         $scope.selectedFundId = String(fund.FUND_ID);
         $scope.loadInvestments();
         $timeout(function() {
+            if (aumChart) {
+                aumChart.destroy();
+                aumChart = null;
+            }
             buildSectorChart(fund);
             buildWeightChart(fund);
         }, 100);
@@ -118,7 +195,7 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
         if (!ctx) return;
         if (sectorChart) sectorChart.destroy();
 
-        var positions = $scope.allInvestments.filter(function(i) { return i.FUND_ID === fund.FUND_ID; });
+        var positions = $scope.allInvestments.filter(function(i) { return String(i.FUND_ID) === String(fund.FUND_ID); });
         var sectors = {};
         positions.forEach(function(p) {
             if (!sectors[p.SECTOR]) sectors[p.SECTOR] = { long: 0, short: 0 };
@@ -127,6 +204,7 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
         });
 
         var labels = Object.keys(sectors);
+        if (!labels.length) return;
         var longData = labels.map(function(s) { return sectors[s].long; });
         var shortData = labels.map(function(s) { return sectors[s].short; });
 
@@ -166,8 +244,10 @@ app.controller('FinancialCtrl', ['$scope', '$http', '$timeout', function($scope,
         if (weightChart) weightChart.destroy();
 
         var positions = $scope.allInvestments
-            .filter(function(i) { return i.FUND_ID === fund.FUND_ID; })
+            .filter(function(i) { return String(i.FUND_ID) === String(fund.FUND_ID); })
             .sort(function(a, b) { return b.WEIGHT_PCT - a.WEIGHT_PCT; });
+
+        if (!positions.length) return;
 
         var labels = positions.map(function(p) { return p.TICKER || p.SECURITY_NAME; });
         var data = positions.map(function(p) { return p.WEIGHT_PCT; });

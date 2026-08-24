@@ -23,7 +23,7 @@ app.controller('ReportingCtrl', ['$scope', '$http', '$timeout', function($scope,
 
     $http.get('/api/funds').then(function(resp) {
         $scope.funds = resp.data;
-        var defaultFund = resp.data.filter(function(f) { return f.FUND_NAME === 'PE Partners AI Growth Fund'; })[0];
+        var defaultFund = resp.data[0];
         if (defaultFund && !$scope.selectedFundId) {
             $scope.selectedFundId = String(defaultFund.FUND_ID);
             $scope.selectedFund = defaultFund;
