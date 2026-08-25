@@ -36,7 +36,7 @@ INSERT INTO CUSTOMERS_STG (CUSTOMER_ID, FULL_NAME, COMPANY_NAME, INVESTOR_TYPE, 
 -- =============================================================================
 
 INSERT INTO INVESTMENTS_STG (INVESTMENT_ID, FUND_ID, SECURITY_NAME, TICKER, SECTOR, POSITION_TYPE, MARKET_VALUE_GBP, WEIGHT_PCT, GEOGRAPHY, ENTRY_DATE) VALUES
--- Fund 1: Blackstone Capital Partners IX
+-- Fund 1: PE Partners Capital Partners IX
 (1, 1, 'OpenAI', 'OAIP', 'AI/ML', 'LONG', 12600000000.00, 30.00, 'North America', '2020-06-01'),
 (2, 1, 'Anthropic', 'ANTH', 'AI/ML', 'LONG', 10500000000.00, 25.00, 'North America', '2021-01-15'),
 (3, 1, 'Scale AI', 'SCAI', 'AI/ML', 'LONG', 6300000000.00, 15.00, 'North America', '2021-09-01'),
@@ -46,7 +46,7 @@ INSERT INTO INVESTMENTS_STG (INVESTMENT_ID, FUND_ID, SECURITY_NAME, TICKER, SECT
 (7, 1, 'Stability AI', 'STAB', 'AI/ML', 'SHORT', -2100000000.00, 5.00, 'Europe', '2023-03-01'),
 (29, 1, 'xAI', 'XAI', 'AI/ML', 'LONG', 2520000000.00, 6.00, 'North America', '2024-02-15'),
 (30, 1, 'Shield AI', 'SHLD', 'Defense Tech', 'LONG', 1680000000.00, 4.00, 'North America', '2024-04-12'),
--- Fund 2: Blackstone Real Estate Partners X
+-- Fund 2: PE Partners Real Estate Partners X
 (8, 2, 'CoreWeave', 'CWVE', 'Cloud Infrastructure', 'LONG', 8400000000.00, 30.00, 'North America', '2021-06-01'),
 (9, 2, 'Lambda Labs', 'LMDA', 'Cloud Infrastructure', 'LONG', 5600000000.00, 20.00, 'North America', '2021-09-15'),
 (10, 2, 'Cerebras Systems', 'CRBS', 'AI Hardware', 'LONG', 4200000000.00, 15.00, 'North America', '2022-01-15'),
@@ -56,7 +56,7 @@ INSERT INTO INVESTMENTS_STG (INVESTMENT_ID, FUND_ID, SECURITY_NAME, TICKER, SECT
 (14, 2, 'WekaIO', 'WEKA', 'Data Infrastructure', 'SHORT', -1400000000.00, 5.00, 'North America', '2023-04-01'),
 (31, 2, 'Crusoe Energy', 'CRUE', 'Data Centers', 'LONG', 1960000000.00, 7.00, 'North America', '2023-10-01'),
 (32, 2, 'Groq', 'GROQ', 'AI Hardware', 'LONG', 1680000000.00, 6.00, 'North America', '2024-02-01'),
--- Fund 3: Blackstone Tactical Opportunities V
+-- Fund 3: PE Partners Tactical Opportunities V
 (15, 3, 'Cursor AI', 'CURS', 'Developer Tools', 'LONG', 3600000000.00, 20.00, 'North America', '2023-06-15'),
 (16, 3, 'Perplexity AI', 'PPLX', 'AI/ML', 'LONG', 2700000000.00, 15.00, 'North America', '2023-08-01'),
 (17, 3, 'Mistral AI', 'MIST', 'AI/ML', 'LONG', 2700000000.00, 15.00, 'Europe', '2023-03-01'),
@@ -65,7 +65,7 @@ INSERT INTO INVESTMENTS_STG (INVESTMENT_ID, FUND_ID, SECURITY_NAME, TICKER, SECT
 (20, 3, 'Character AI', 'CHAI', 'Consumer AI', 'LONG', 1440000000.00, 8.00, 'North America', '2023-10-01'),
 (33, 3, 'Anduril', 'ANDR', 'Defense Tech', 'LONG', 1260000000.00, 7.00, 'North America', '2024-01-20'),
 (34, 3, 'Windsurf', 'WIND', 'Developer Tools', 'LONG', 900000000.00, 5.00, 'North America', '2024-05-15'),
--- Fund 4: Blackstone Energy Partners IV
+-- Fund 4: PE Partners Energy Partners IV
 (21, 4, 'Jasper AI', 'JASP', 'Content AI', 'LONG', 3000000000.00, 25.00, 'North America', '2023-03-15'),
 (22, 4, 'Harvey AI', 'HRVY', 'Legal AI', 'LONG', 2400000000.00, 20.00, 'North America', '2023-05-01'),
 (23, 4, 'Abridge', 'ABRD', 'Healthcare AI', 'LONG', 1800000000.00, 15.00, 'North America', '2023-07-15'),
@@ -82,18 +82,18 @@ INSERT INTO INVESTMENTS_STG (INVESTMENT_ID, FUND_ID, SECURITY_NAME, TICKER, SECT
 -- =============================================================================
 
 INSERT INTO FUND_PERFORMANCE_STG (PERF_ID, FUND_ID, REPORTING_DATE, MONTHLY_RETURN_PCT, YTD_RETURN_PCT, SHARPE_RATIO, MAX_DRAWDOWN_PCT, VOLATILITY_PCT) VALUES
--- Fund 1: Blackstone Capital Partners IX
+-- Fund 1: PE Partners Capital Partners IX
 (9, 1, '2026-05-31', 3.1000, 22.3100, 2.050, -7.5000, 13.8000),
 (5, 1, '2026-06-30', 2.9500, 25.2600, 2.100, -8.2000, 14.2000),
 (1, 1, '2026-07-31', 3.2400, 28.5000, 2.150, -8.2000, 14.5000),
--- Fund 2: Blackstone Real Estate Partners X
+-- Fund 2: PE Partners Real Estate Partners X
 (10, 2, '2026-05-31', 2.6000, 17.0500, 1.840, -6.2000, 12.2000),
 (6, 2, '2026-06-30', 2.4500, 19.5000, 1.880, -6.5000, 12.5000),
 (2, 2, '2026-07-31', 2.8000, 22.3000, 1.950, -6.5000, 12.8000),
--- Fund 3: Blackstone Tactical Opportunities V
+-- Fund 3: PE Partners Tactical Opportunities V
 (7, 3, '2026-06-30', 3.8000, 31.3000, 2.350, -12.3000, 17.8000),
 (3, 3, '2026-07-31', 4.5000, 35.8000, 2.450, -12.3000, 18.2000),
--- Fund 4: Blackstone Energy Partners IV
+-- Fund 4: PE Partners Energy Partners IV
 (11, 3, '2026-05-31', 3.2000, 27.5000, 2.260, -11.9000, 17.1000),
 (8, 4, '2026-06-30', 1.8500, 16.5000, 1.680, -5.8000, 11.1000),
 (12, 4, '2026-05-31', 1.6000, 14.4000, 1.620, -5.5000, 10.9000),

@@ -108,9 +108,8 @@ app.controller('SearchCtrl', ['$scope', '$http', '$sce', function($scope, $http,
 
     $http.get('/api/filings/companies').then(function(resp) {
         $scope.companies = resp.data || [];
-        var openai = $scope.companies.filter(function(c) { return c.TICKER === 'OAIP'; })[0];
-        if (openai) {
-            $scope.selectedTicker = openai.TICKER;
+        if ($scope.companies.length > 0) {
+            $scope.selectedTicker = $scope.companies[0].TICKER;
             $scope.loadFilings('Funding Round');
         }
     });

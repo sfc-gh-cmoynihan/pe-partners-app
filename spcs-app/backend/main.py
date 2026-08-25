@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, FileResponse, Resp
 from backend.db import get_conn, query
 from backend import report as report_module
 
-app = FastAPI(title="Blackstone-Style Demo API")
+app = FastAPI(title="PE Partners API")
 
 FILINGS_SEARCH_SERVICE = os.getenv(
     "FILINGS_SEARCH_SERVICE",
@@ -253,11 +253,22 @@ def get_call_video(call_id: str):
 @app.get("/api/models")
 def list_models():
     return [
+        "claude-sonnet-5",
+        "claude-opus-5",
+        "claude-opus-4-8",
+        "claude-opus-4-7",
+        "gemini-3.1-pro",
+        "llama4-maverick",
+        "llama3.1-8b",
         "openai-gpt-5.2",
+        "openai-gpt-5.1",
         "openai-gpt-5.4-mini",
         "openai-gpt-5.4-nano",
-        "openai-o3",
-        "openai-o4-mini",
+        "openai-gpt-4.1",
+        "mistral-large2",
+        "mistral-large3",
+        "mixtral-8x7b",
+        "mistral-7b",
     ]
 
 
@@ -265,7 +276,7 @@ def list_models():
 async def agent_chat(request: Request):
     body = await request.json()
     messages = body.get("messages", [])
-    model = body.get("model", "openai-gpt-5.2")
+    model = body.get("model", "claude-sonnet-5")
     user_msg = messages[-1].get("content", "") if messages else ""
     if not user_msg:
         return JSONResponse({"error": "No message"}, status_code=400)
@@ -314,18 +325,19 @@ async def agent_chat(request: Request):
             pass
 
         data_context = "\n\n".join(context_parts)
-        system_prompt = f"You are the Blackstone-style Investment Intelligence Assistant. Answer using ONLY the data below. Be concise with exact numbers.\n\n{data_context}"
+        system_prompt = f"You are the PE Partners Investment Intelligence Assistant. Answer using ONLY the data below. Be concise with exact numbers.\n\n{data_context}"
+        complete_prompt = f"{system_prompt}\n\nUser question: {user_msg}"
 
         cur.execute("""
-            SELECT SNOWFLAKE.CORTEX.COMPLETE(
-                %s,
-                ARRAY_CONSTRUCT(
-                    OBJECT_CONSTRUCT('role', 'system', 'content', %s),
-                    OBJECT_CONSTRUCT('role', 'user', 'content', %s)
-                ),
-                OBJECT_CONSTRUCT('temperature', 0.3, 'max_tokens', 1024)
-            ):choices[0]:messages::VARCHAR
-        """, (model, system_prompt, user_msg))
+            SELECT AI_COMPLETE(
+                model => %s,
+                prompt => %s,
+                model_parameters => {
+                    'temperature': 0.3,
+                    'max_tokens': 1024
+                }
+            )
+        """, (model, complete_prompt))
         row = cur.fetchone()
         if row and row[0]:
             return {"response": str(row[0]).strip()}

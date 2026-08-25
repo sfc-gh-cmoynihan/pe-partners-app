@@ -1,6 +1,6 @@
-# Blackstone-Style Demo - LP Intelligence Platform
+# PE Application - Built and powered by Snowflake
 
-A full-stack investment intelligence application for private markets fund management, styled as a Blackstone-inspired demo, deployed on Snowpark Container Services (SPCS). Built with FastAPI, AngularJS, and Snowflake Cortex AI.
+A full-stack investment intelligence application for private markets fund management, deployed on Snowpark Container Services (SPCS). Built with FastAPI, AngularJS, and Snowflake Cortex AI.
 
 ## Features
 

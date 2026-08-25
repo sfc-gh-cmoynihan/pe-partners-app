@@ -6,16 +6,21 @@ app.controller('AgentCtrl', ['$scope', '$http', function($scope, $http) {
 
     $scope.models = [
         'claude-sonnet-5',
+        'claude-opus-5',
         'claude-opus-4-8',
-        'claude-sonnet-4-6',
-        'claude-opus-4-6',
+        'claude-opus-4-7',
         'gemini-3.1-pro',
         'llama4-maverick',
         'llama3.1-8b',
         'openai-gpt-5.2',
+        'openai-gpt-5.1',
         'openai-gpt-5.4-mini',
+        'openai-gpt-5.4-nano',
+        'openai-gpt-4.1',
         'mistral-large2',
-        'mixtral-8x7b'
+        'mistral-large3',
+        'mixtral-8x7b',
+        'mistral-7b'
     ];
     $scope.agent = { selectedModel: 'claude-sonnet-5' };
 

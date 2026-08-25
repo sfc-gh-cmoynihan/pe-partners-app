@@ -1,4 +1,4 @@
-var APP_VERSION = 'v4.1';
+var APP_VERSION = 'v5.2';
 var app = angular.module('peApp', ['ngRoute']);
 
 app.config(['$routeProvider', function($routeProvider) {

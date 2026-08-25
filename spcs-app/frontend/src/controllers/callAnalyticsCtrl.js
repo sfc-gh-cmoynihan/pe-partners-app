@@ -9,9 +9,8 @@ app.controller('CallAnalyticsCtrl', ['$scope', '$http', '$sce', function($scope,
 
     $http.get('/api/calls/companies').then(function(resp) {
         $scope.companies = resp.data || [];
-        var openai = $scope.companies.filter(function(c) { return c.COMPANY_NAME === 'OpenAI'; })[0];
-        if (openai) {
-            $scope.selectedCompany = openai.COMPANY_NAME;
+        if ($scope.companies.length > 0) {
+            $scope.selectedCompany = $scope.companies[0].COMPANY_NAME;
             $scope.onCompanyChange();
         }
     });
