@@ -1,4 +1,4 @@
-# PE Application - Built and powered by Snowflake
+# Private Equity - LP Intelligence Platform
 
 A full-stack investment intelligence application for private markets fund management, deployed on Snowpark Container Services (SPCS). Built with FastAPI, AngularJS, and Snowflake Cortex AI.
 
